@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接続テスト - モバイルオーダー</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+        }
+        .test-link {
+            display: block;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .test-link:hover {
+            background-color: #45a049;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="test-card">
+        <h1>📱 モバイルオーダーシステム</h1>
+        <h2>接続テスト</h2>
+        
+        <div class="status info">
+            <strong>✅ 基本接続成功!</strong><br>
+            このページが表示されている場合、Apache とファイル配置は正常です。
+        </div>
+        
+        <h3>🔗 テストリンク</h3>
+        
+        <a href="admin/login.php" class="test-link">
+            🔐 管理画面ログイン
+        </a>
+        
+        <a href="public/index.html" class="test-link">
+            🛒 顧客注文画面
+        </a>
+        
+        <a href="public/table.html" class="test-link">
+            📋 テーブル選択画面
+        </a>
+        
+        <a href="public/qr-generator.html" class="test-link">
+            📱 QRコード生成ツール
+        </a>
+        
+        <h3>📊 システム情報</h3>
+        <div class="status info">
+            <strong>アクセスURL:</strong> http://localhost/mobileorder/test.html<br>
+            <strong>PHP バージョン:</strong> <?php echo phpversion(); ?><br>
+            <strong>現在時刻:</strong> <?php echo date('Y-m-d H:i:s'); ?><br>
+        </div>
+        
+        <h3>🚀 次のステップ</h3>
+        <ol>
+            <li>上記のリンクが正常に動作するか確認</li>
+            <li>phpMyAdminでデータベースを作成</li>
+            <li>sql/schema.sql をインポート</li>
+            <li>管理画面でログイン（admin / admin123）</li>
+        </ol>
+        
+        <div class="status error" id="error-info" style="display: none;">
+            <strong>❌ エラーが発生した場合:</strong><br>
+            1. XAMPPのApache、MySQLが起動しているか確認<br>
+            2. ファイルが正しい場所に配置されているか確認<br>
+            3. ブラウザのURLが正しいか確認
+        </div>
+    </div>
+
+    <script>
+        // 簡単な動作テスト
+        console.log('✅ JavaScript 動作中');
+        
+        // API接続テスト
+        fetch('api/menu.php')
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ API接続成功');
+                } else {
+                    console.log('⚠️ API接続エラー - データベース未設定の可能性');
+                }
+            })
+            .catch(error => {
+                console.log('❌ API接続失敗:', error);
+                document.getElementById('error-info').style.display = 'block';
+            });
+    </script>
+</body>
+</html>

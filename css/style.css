@@ -1,0 +1,475 @@
+/* モバイルオーダーシステム - 顧客用スタイル */
+
+:root {
+    --primary-color: #4CAF50;
+    --primary-dark: #45a049;
+    --secondary-color: #2196F3;
+    --danger-color: #f44336;
+    --warning-color: #ff9800;
+    --success-color: #4CAF50;
+    --background-color: #f5f5f5;
+    --card-background: #ffffff;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --border-color: #dddddd;
+    --shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    padding-bottom: 80px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* ヘッダー */
+.header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 16px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+}
+
+.header h1 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* テーブル番号入力 */
+.table-selection {
+    background-color: var(--card-background);
+    margin: 16px 0;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.table-selection h2 {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    font-size: 20px;
+}
+
+.table-input {
+    width: 100%;
+    max-width: 200px;
+    padding: 16px;
+    font-size: 18px;
+    text-align: center;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.table-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* カテゴリフィルター */
+.category-filter {
+    background-color: var(--card-background);
+    margin: 16px 0;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.category-btn {
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    background-color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.category-btn.active,
+.category-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* メニュー項目 */
+.menu-grid {
+    display: grid;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.menu-item {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.menu-item:hover {
+    transform: translateY(-2px);
+}
+
+.menu-item-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background-color: var(--background-color);
+}
+
+.menu-item-content {
+    padding: 16px;
+}
+
+.menu-item-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.menu-item-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.menu-item-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 16px;
+}
+
+.menu-item-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.quantity-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--primary-color);
+    background-color: white;
+    color: var(--primary-color);
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.quantity-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.quantity-display {
+    font-size: 18px;
+    font-weight: 600;
+    min-width: 30px;
+    text-align: center;
+}
+
+/* カート */
+.cart-button {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.cart-button:hover {
+    background-color: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--danger-color);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 2000;
+    display: flex;
+    align-items: flex-end;
+}
+
+.cart-content {
+    background-color: white;
+    width: 100%;
+    max-height: 80vh;
+    border-radius: 20px 20px 0 0;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.cart-title {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.close-cart {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.cart-item-price {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.cart-total {
+    margin: 24px 0;
+    padding: 16px;
+    background-color: var(--background-color);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.cart-total-amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.special-requests {
+    margin-bottom: 24px;
+}
+
+.special-requests label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.special-requests textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+/* ボタン */
+.btn {
+    display: inline-block;
+    padding: 16px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-height: 48px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* メッセージ */
+.message {
+    padding: 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+    text-align: center;
+    font-weight: 600;
+}
+
+.message-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.message-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* 読み込み中 */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 非表示 */
+.hidden {
+    display: none !important;
+}
+
+/* レスポンシブ */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 12px;
+    }
+    
+    .menu-item-content {
+        padding: 12px;
+    }
+    
+    .cart-content {
+        padding: 16px;
+    }
+    
+    .header h1 {
+        font-size: 20px;
+    }
+}
+
+/* PWA対応 */
+@media (display-mode: standalone) {
+    .header {
+        padding-top: 24px;
+    }
+}

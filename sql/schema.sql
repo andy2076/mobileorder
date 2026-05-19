@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS order_items (
 
 -- 初期データ: 管理者 (パスワード: admin123)
 INSERT INTO admins (username, password, shop_name) VALUES
-('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'サンプル食堂');
+('admin', '$2y$10$3s3RB.gWYvKEgv.OcieTPOUy7eMoMOkNoSzQwKXSy6.WJx8.RKwxy', 'サンプル食堂');
 
 -- 初期データ: カテゴリ
 INSERT INTO categories (name, sort_order) VALUES

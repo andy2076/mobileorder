@@ -139,10 +139,10 @@ class MobileOrder {
         const div = document.createElement('div');
         div.className = 'menu-item';
         div.innerHTML = `
-            <img src="${item.image_url || '../images/no-image.jpg'}" 
-                 alt="${item.name}" 
+            <img src="${item.image_url || '../images/no-image.jpg'}"
+                 alt="${item.name}"
                  class="menu-item-image"
-                 onerror="this.src='../images/no-image.jpg'">
+                 onerror="this.onerror=null;this.src='../images/no-image.jpg'">
             <div class="menu-item-content">
                 <h3 class="menu-item-name">${item.name}</h3>
                 <p class="menu-item-description">${item.description || ''}</p>

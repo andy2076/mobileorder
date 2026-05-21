@@ -27,8 +27,8 @@
 <body>
     <div class="card no-print">
         <h1>🪑 テーブルQRコード生成</h1>
-        <label>サイトURL（例: https://yourdomain.com/mobileorder/public）</label>
-        <input type="text" id="base-url" placeholder="https://yourdomain.com/mobileorder/public">
+        <label>店舗URL（例: https://machiorder.com/s/default）</label>
+        <input type="text" id="base-url" placeholder="https://machiorder.com/s/default">
         <label>テーブル数</label>
         <input type="number" id="table-count" value="10" min="1" max="99">
         <button class="btn" onclick="generateQR()">QRコードを生成</button>
@@ -55,7 +55,7 @@
             const grid = document.getElementById('qr-grid');
 
             for (let i = 1; i <= count; i++) {
-                const url = `${baseUrl}/index.html?table=${i}`;
+                const url = `${baseUrl}/?table=${i}`;
                 const div = document.createElement('div');
                 div.className = 'qr-item';
                 div.innerHTML = `<div id="qr-${i}"></div><h3>テーブル ${i}</h3><p style="word-break:break-all;font-size:10px">${url}</p>`;

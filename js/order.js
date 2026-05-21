@@ -2,7 +2,7 @@
 
 class MobileOrder {
     constructor() {
-        this.apiBase = '../api';
+        this.apiBase = window.API_BASE || '../api';
         this.tableNumber = null;
         this.cart = [];
         this.menuItems = [];
@@ -82,33 +82,34 @@ class MobileOrder {
     }
     
     renderCategories() {
-        const categoryButtons = document.getElementById('category-buttons');
-        
-        const allButton = categoryButtons.querySelector('[data-category=\"\"]');
-        categoryButtons.innerHTML = '';
-        categoryButtons.appendChild(allButton);
-        
+        const headerCats = document.getElementById('header-categories');
+        if (!headerCats) return;
+        headerCats.innerHTML = '';
+
+        const allBtn = document.createElement('button');
+        allBtn.className = 'cat-btn active';
+        allBtn.dataset.category = '';
+        allBtn.textContent = 'すべて';
+        allBtn.addEventListener('click', () => this.filterByCategory(''));
+        headerCats.appendChild(allBtn);
+
         this.categories.forEach(category => {
-            const button = document.createElement('button');
-            button.className = 'category-btn';
-            button.dataset.category = category;
-            button.textContent = category;
-            button.addEventListener('click', () => this.filterByCategory(category));
-            categoryButtons.appendChild(button);
+            const btn = document.createElement('button');
+            btn.className = 'cat-btn';
+            btn.dataset.category = category;
+            btn.textContent = category;
+            btn.addEventListener('click', () => this.filterByCategory(category));
+            headerCats.appendChild(btn);
         });
-        
-        // すべてボタンのイベントリスナー
-        allButton.addEventListener('click', () => this.filterByCategory(''));
     }
     
     filterByCategory(category) {
         this.currentCategory = category;
         
         // アクティブなボタンを更新
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.classList.remove('active');
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.category === category);
         });
-        document.querySelector(`[data-category="${category}"]`).classList.add('active');
         
         this.renderMenu();
     }
@@ -132,17 +133,23 @@ class MobileOrder {
         });
     }
     
+    isVideo(url) {
+        if (!url) return false;
+        return /\.(mp4|webm)(\?|$)/i.test(url);
+    }
+
     createMenuItemElement(item) {
         const cartItem = this.cart.find(cartItem => cartItem.id === item.id);
         const quantity = cartItem ? cartItem.quantity : 0;
         
         const div = document.createElement('div');
         div.className = 'menu-item';
+        div.dataset.itemId = item.id;
         div.innerHTML = `
-            <img src="${item.image_url || '../images/no-image.jpg'}"
-                 alt="${item.name}"
-                 class="menu-item-image"
-                 onerror="this.onerror=null;this.src='../images/no-image.jpg'">
+            ${this.isVideo(item.image_url)
+                ? '<video src="' + item.image_url + '" class="menu-item-image" autoplay muted loop playsinline></video>'
+                : '<img src="' + (item.image_url || '/mobileorder/images/no-image.jpg') + '" alt="' + item.name + '" class="menu-item-image" onerror="this.onerror=null;this.src=\'/mobileorder/images/no-image.jpg\'">'
+            }
             <div class="menu-item-content">
                 <h3 class="menu-item-name">${item.name}</h3>
                 <p class="menu-item-description">${item.description || ''}</p>
@@ -182,7 +189,7 @@ class MobileOrder {
         }
         
         this.updateCartDisplay();
-        this.renderMenu(); // 数量表示を更新
+        this.updateItemQuantity(itemId);
     }
     
     decreaseQuantity(itemId) {
@@ -197,7 +204,19 @@ class MobileOrder {
         }
         
         this.updateCartDisplay();
-        this.renderMenu(); // 数量表示を更新
+        this.updateItemQuantity(itemId);
+    }
+
+    updateItemQuantity(itemId) {
+        const el = document.querySelector(`.menu-item[data-item-id="${itemId}"]`);
+        if (!el) return;
+        
+        const cartItem = this.cart.find(ci => ci.id === itemId);
+        const quantity = cartItem ? cartItem.quantity : 0;
+        
+        el.querySelector('.quantity-display').textContent = quantity;
+        const decreaseBtn = el.querySelector('.quantity-btn');
+        decreaseBtn.disabled = quantity === 0;
     }
     
     updateCartDisplay() {

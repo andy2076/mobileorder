@@ -1,10 +1,17 @@
+<?php
+require_once '../config/config.php';
+require_once '../config/database.php';
+$database = new Database();
+$db = $database->getConnection();
+$store = resolve_store($db);
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理者ログイン</title>
-    <link rel="stylesheet" href="../css/admin.css">
+    <title>管理者ログイン - <?= htmlspecialchars($store['name']) ?></title>
+    <link rel="stylesheet" href="/mobileorder/css/admin.css">
     <style>
         body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f0f2f5; }
         .login-box { background: #fff; border-radius: 12px; padding: 40px 32px; width: 100%; max-width: 360px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
@@ -21,8 +28,8 @@
 </head>
 <body>
     <div class="login-box">
-        <h1>🍽️ 管理者ログイン</h1>
-        <p>モバイルオーダー 店舗管理</p>
+        <h1><?= htmlspecialchars($store['name']) ?></h1>
+        <p>管理者ログイン</p>
         <div class="error-msg" id="error-msg"></div>
         <div class="form-group">
             <label>ユーザー名</label>
@@ -35,6 +42,7 @@
         <button class="btn-login" onclick="login()">ログイン</button>
     </div>
     <script>
+        const API_BASE = '<?= store_url("api") ?>';
         document.addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
         async function login() {
             const username = document.getElementById('username').value.trim();
@@ -47,7 +55,7 @@
                 return;
             }
             try {
-                const res = await fetch('../api/auth.php', {
+                const res = await fetch(API_BASE + '/auth.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })

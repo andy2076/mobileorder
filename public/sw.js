@@ -1,10 +1,8 @@
-const CACHE_NAME = 'mobileorder-v2';
+const CACHE_NAME = 'mobileorder-v7';
 const ASSETS = [
-    './',
-    './index.html',
-    '../css/style.css',
-    '../js/order.js',
-    '../images/no-image.jpg'
+    '/mobileorder/css/style.css',
+    '/mobileorder/js/order.js',
+    '/mobileorder/images/no-image.jpg'
 ];
 
 self.addEventListener('install', event => {
@@ -23,7 +21,6 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-    // APIリクエストはキャッシュしない
     if (event.request.url.includes('/api/')) {
         return;
     }

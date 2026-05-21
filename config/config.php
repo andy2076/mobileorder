@@ -1,20 +1,35 @@
 <?php
 session_start();
 
-define('BASE_URL', '/mobileorder'); // XAMPP用: http://localhost/mobileorder
-define('UPLOAD_PATH', __DIR__ . '/../images/');
-define('UPLOAD_URL', BASE_URL . '/images/');
+require_once __DIR__ . '/store.php';
 
-define('MAX_UPLOAD_SIZE', 5 * 1024 * 1024);
+define('MAX_UPLOAD_SIZE', 30 * 1024 * 1024);
 define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+define('ALLOWED_VIDEO_TYPES', ['video/mp4', 'video/webm']);
+define('ALLOWED_MEDIA_TYPES', array_merge(ALLOWED_IMAGE_TYPES, ALLOWED_VIDEO_TYPES));
+define('MAX_VIDEO_DURATION', 10); // seconds
 
 define('ORDER_STATUS', [
     'pending' => '注文受付',
     'preparing' => '調理中',
     'ready' => '完成',
     'completed' => '受渡完了',
-    'cancelled' => 'キャンセル'
+    'cancelled' => 'キャンセル',
+    'paid' => '会計済み'
 ]);
+
+function get_upload_path() {
+    $slug = get_store_slug();
+    $path = __DIR__ . '/../images/stores/' . $slug . '/menu/';
+    if (!is_dir($path)) {
+        mkdir($path, 0755, true);
+    }
+    return $path;
+}
+
+function get_upload_url() {
+    return '/s/' . get_store_slug() . '/images/menu/';
+}
 
 function sanitize_input($data) {
     return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
@@ -48,7 +63,15 @@ function is_admin_logged_in() {
 
 function require_admin_login() {
     if (!is_admin_logged_in()) {
-        header('Location: ' . BASE_URL . '/admin/login.php');
+        header('Location: ' . get_base_url() . '/admin/login.php');
+        exit;
+    }
+    // 管理者が現在の店舗に所属しているか確認
+    $store_id = get_store_id();
+    if ($store_id && isset($_SESSION['admin_store_id']) && $_SESSION['admin_store_id'] !== $store_id) {
+        session_destroy();
+        session_start();
+        header('Location: ' . get_base_url() . '/admin/login.php');
         exit;
     }
 }

@@ -16,6 +16,9 @@ $database = new Database();
 $db = $database->getConnection();
 if (!$db) send_json_response(['success' => false, 'error' => 'データベース接続エラー'], 500);
 
+$store = resolve_store($db);
+$store_id = (int)$store['id'];
+
 $input = json_decode(file_get_contents('php://input'), true);
 
 $table_number    = (int)($input['table_number'] ?? 0);
@@ -32,7 +35,6 @@ if (empty($items)) {
 try {
     $db->beginTransaction();
 
-    // メニュー情報を取得して合計金額計算
     $total_amount = 0;
     $order_items = [];
 
@@ -41,13 +43,14 @@ try {
         $quantity = (int)($item['quantity'] ?? 1);
         if (!$item_id || $quantity < 1) continue;
 
-        $stmt = $db->prepare("SELECT id, name, price, is_available FROM menu_items WHERE id = :id");
-        $stmt->execute([':id' => $item_id]);
+        $stmt = $db->prepare("SELECT id, name, price, is_available FROM menu_items WHERE id = :id AND store_id = :store_id");
+        $stmt->execute([':id' => $item_id, ':store_id' => $store_id]);
         $menu_item = $stmt->fetch();
 
         if (!$menu_item || !$menu_item['is_available']) {
             $db->rollBack();
-            send_json_response(['success' => false, 'error' => "「{$menu_item['name']}」は現在注文できません"], 400);
+            $name = $menu_item['name'] ?? '不明な商品';
+            send_json_response(['success' => false, 'error' => "「{$name}」は現在注文できません"], 400);
         }
 
         $total_amount += $menu_item['price'] * $quantity;
@@ -59,17 +62,16 @@ try {
         ];
     }
 
-    // 注文登録
-    $stmt = $db->prepare("INSERT INTO orders (table_number, status, total_amount, special_requests)
-                          VALUES (:table_number, 'pending', :total_amount, :special_requests)");
+    $stmt = $db->prepare("INSERT INTO orders (store_id, table_number, status, total_amount, special_requests)
+                          VALUES (:store_id, :table_number, 'pending', :total_amount, :special_requests)");
     $stmt->execute([
+        ':store_id'        => $store_id,
         ':table_number'    => $table_number,
         ':total_amount'    => $total_amount,
         ':special_requests'=> $special_requests,
     ]);
     $order_id = $db->lastInsertId();
 
-    // 明細登録
     foreach ($order_items as $oi) {
         $stmt = $db->prepare("INSERT INTO order_items (order_id, menu_item_id, item_name, item_price, quantity)
                               VALUES (:order_id, :menu_item_id, :item_name, :item_price, :quantity)");

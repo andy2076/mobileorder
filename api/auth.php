@@ -20,14 +20,18 @@ $database = new Database();
 $db = $database->getConnection();
 if (!$db) send_json_response(['success' => false, 'error' => 'データベース接続エラー'], 500);
 
-$stmt = $db->prepare("SELECT id, username, password FROM admins WHERE username = :username");
-$stmt->execute([':username' => $username]);
+$store = resolve_store($db);
+$store_id = (int)$store['id'];
+
+$stmt = $db->prepare("SELECT id, username, password, store_id FROM admins WHERE username = :username AND store_id = :store_id");
+$stmt->execute([':username' => $username, ':store_id' => $store_id]);
 $admin = $stmt->fetch();
 
 if ($admin && password_verify($password, $admin['password'])) {
     $_SESSION['admin_id'] = $admin['id'];
     $_SESSION['admin_username'] = $admin['username'];
-    send_json_response(['success' => true, 'redirect' => BASE_URL . '/admin/dashboard.php']);
+    $_SESSION['admin_store_id'] = (int)$admin['store_id'];
+    send_json_response(['success' => true, 'redirect' => store_url('admin/dashboard.php')]);
 } else {
     send_json_response(['success' => false, 'error' => 'ユーザー名またはパスワードが違います'], 401);
 }

@@ -30,7 +30,7 @@ body {
 }
 
 .container {
-    max-width: 600px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 0 16px;
 }
@@ -39,17 +39,56 @@ body {
 .header {
     background-color: var(--primary-color);
     color: white;
-    padding: 16px 0;
+    padding: 10px 0;
     position: sticky;
     top: 0;
     z-index: 100;
     box-shadow: var(--shadow);
 }
 
+.header-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.header-inner::-webkit-scrollbar {
+    display: none;
+}
+
 .header h1 {
-    text-align: center;
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.header-categories {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.header-categories .cat-btn {
+    padding: 5px 12px;
+    border: none;
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.header-categories .cat-btn.active {
+    background: #fff;
+    color: var(--primary-color);
+    font-weight: 700;
 }
 
 /* テーブル番号入力 */
@@ -84,43 +123,14 @@ body {
     border-color: var(--primary-color);
 }
 
-/* カテゴリフィルター */
-.category-filter {
-    background-color: var(--card-background);
-    margin: 16px 0;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-}
-
-.category-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.category-btn {
-    padding: 12px 16px;
-    border: 2px solid var(--border-color);
-    background-color: white;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.category-btn.active,
-.category-btn:hover {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
+/* カテゴリフィルター (旧スタイル非表示) */
+.category-btn { display: none; }
 
 /* メニュー項目 */
 .menu-grid {
     display: grid;
-    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
     margin: 16px 0;
 }
 
@@ -138,34 +148,45 @@ body {
 
 .menu-item-image {
     width: 100%;
-    height: 200px;
+    height: 120px;
+    object-fit: cover;
+    background-color: var(--background-color);
+}
+
+video.menu-item-image {
+    width: 100%;
+    height: 120px;
     object-fit: cover;
     background-color: var(--background-color);
 }
 
 .menu-item-content {
-    padding: 16px;
+    padding: 10px;
 }
 
 .menu-item-name {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     color: var(--text-primary);
 }
 
 .menu-item-description {
-    font-size: 14px;
+    font-size: 12px;
     color: var(--text-secondary);
-    margin-bottom: 12px;
-    line-height: 1.4;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .menu-item-price {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--primary-color);
-    margin-bottom: 16px;
+    margin-bottom: 8px;
 }
 
 .menu-item-actions {
@@ -177,17 +198,17 @@ body {
 .quantity-control {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .quantity-btn {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border: 2px solid var(--primary-color);
     background-color: white;
     color: var(--primary-color);
     border-radius: 50%;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     display: flex;
@@ -207,9 +228,9 @@ body {
 }
 
 .quantity-display {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    min-width: 30px;
+    min-width: 24px;
     text-align: center;
 }
 
@@ -449,13 +470,24 @@ body {
 }
 
 /* レスポンシブ */
+@media (min-width: 768px) {
+    .menu-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .menu-item-image {
+        height: 150px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .menu-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
 @media (max-width: 480px) {
     .container {
         padding: 0 12px;
-    }
-    
-    .menu-item-content {
-        padding: 12px;
     }
     
     .cart-content {

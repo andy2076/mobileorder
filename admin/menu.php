@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>メニュー管理</title>
-    <link rel="stylesheet" href="../css/admin.css">
+    <title>メニュー管理 - <?= htmlspecialchars($store['name']) ?></title>
+    <link rel="stylesheet" href="/mobileorder/css/admin.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #f0f2f5; font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; }
@@ -14,6 +14,8 @@
         .btn-add { background: #4CAF50; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
         .menu-table { width: 100%; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); overflow: hidden; margin-top: 16px; }
         .menu-table table { width: 100%; border-collapse: collapse; }
+        .menu-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; vertical-align: middle; }
+        video.menu-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; vertical-align: middle; }
         .menu-table th { background: #f5f5f5; padding: 12px 16px; text-align: left; font-size: 13px; color: #666; font-weight: 600; }
         .menu-table td { padding: 12px 16px; border-top: 1px solid #f0f0f0; font-size: 14px; vertical-align: middle; }
         .status-on  { background: #E8F5E9; color: #2E7D32; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
@@ -23,8 +25,8 @@
         .btn-toggle { background: #fff; color: #FF9800; border: 1px solid #FF9800; border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
 
         /* モーダル */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .modal { background: #fff; border-radius: 12px; padding: 24px; width: 90%; max-width: 480px; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 20px 0; }
+        .modal { background: #fff; border-radius: 12px; padding: 24px; width: 90%; max-width: 480px; margin: auto; }
         .modal h2 { margin-bottom: 20px; font-size: 18px; }
         .form-group { margin-bottom: 14px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 4px; }
@@ -42,13 +44,18 @@
 <body>
 <?php
 require_once '../config/config.php';
+require_once '../config/database.php';
+$database = new Database();
+$db = $database->getConnection();
+$store = resolve_store($db);
 require_admin_login();
+$api_base = store_url('api');
 ?>
     <div class="header">
         <h1>🥗 メニュー管理</h1>
         <div style="display:flex;gap:12px;align-items:center">
             <button class="btn-add" onclick="openModal()">＋ 追加</button>
-            <a href="dashboard.php" class="back">← 注文管理</a>
+            <a href="<?= store_url('admin/dashboard.php') ?>" class="back">← 注文管理</a>
         </div>
     </div>
 
@@ -57,6 +64,7 @@ require_admin_login();
             <table>
                 <thead>
                     <tr>
+                        <th>画像</th>
                         <th>商品名</th>
                         <th>カテゴリ</th>
                         <th>価格</th>
@@ -93,8 +101,15 @@ require_admin_login();
                 <input type="number" id="edit-price" placeholder="例: 750" min="0">
             </div>
             <div class="form-group">
-                <label>画像URL</label>
-                <input type="text" id="edit-image" placeholder="https://example.com/image.jpg">
+                <label>商品画像・動画</label>
+                <div id="image-preview-area" style="margin-bottom:8px">
+                    <img id="image-preview" src="" style="max-width:100%;max-height:160px;border-radius:8px;display:none">
+                    <video id="video-preview" src="" style="max-width:100%;max-height:160px;border-radius:8px;display:none" controls muted></video>
+                </div>
+                <input type="file" id="edit-image-file" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm" onchange="previewImage(this)" style="font-size:14px">
+                <input type="hidden" id="edit-image" value="">
+                <div id="upload-status" style="font-size:12px;color:#888;margin-top:4px"></div>
+                <div style="font-size:11px;color:#aaa;margin-top:2px">動画は10秒以内（MP4/WebM）</div>
             </div>
             <div class="form-group">
                 <label>販売状態</label>
@@ -115,7 +130,7 @@ require_admin_login();
         let menuItems  = [];
 
         async function loadMenu() {
-            const res  = await fetch('../api/menu.php');
+            const res  = await fetch('<?= $api_base ?>/menu.php');
             const data = await res.json();
             if (!data.success) return;
             menuItems  = data.items;
@@ -136,6 +151,7 @@ require_admin_login();
             }
             tbody.innerHTML = menuItems.map(item => `
                 <tr>
+                    <td>${/\.(mp4|webm)(\?|$)/i.test(item.image_url || '') ? '<video class="menu-thumb" src="' + item.image_url + '" muted autoplay loop playsinline></video>' : '<img class="menu-thumb" src="' + (item.image_url || '/mobileorder/images/no-image.jpg') + '" onerror="this.onerror=null;this.src=\'/mobileorder/images/no-image.jpg\'">'}</td>
                     <td>
                         <strong>${item.name}</strong>
                         ${item.description ? `<div style="font-size:12px;color:#999;margin-top:2px">${item.description}</div>` : ''}
@@ -159,6 +175,17 @@ require_admin_login();
             document.getElementById('edit-desc').value    = item ? (item.description || '') : '';
             document.getElementById('edit-price').value   = item ? item.price : '';
             document.getElementById('edit-image').value   = item ? (item.image_url || '') : '';
+            document.getElementById('edit-image-file').value = '';
+            document.getElementById('upload-status').textContent = '';
+            const imgPreview = document.getElementById('image-preview');
+            const vidPreview = document.getElementById('video-preview');
+            imgPreview.style.display = 'none';
+            vidPreview.style.display = 'none';
+            if (item && item.image_url) {
+                const isVid = /\.(mp4|webm)(\?|$)/i.test(item.image_url);
+                if (isVid) { vidPreview.src = item.image_url; vidPreview.style.display = 'block'; }
+                else { imgPreview.src = item.image_url; imgPreview.style.display = 'block'; }
+            }
             document.getElementById('edit-available').value = item ? (item.is_available ? '1' : '0') : '1';
             if (item && item.category) {
                 document.getElementById('edit-category').value = item.category;
@@ -176,14 +203,76 @@ require_admin_login();
             return name;
         }
 
+        function previewImage(input) {
+            const imgPreview = document.getElementById('image-preview');
+            const vidPreview = document.getElementById('video-preview');
+            imgPreview.style.display = 'none';
+            vidPreview.style.display = 'none';
+
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const isVideo = file.type.startsWith('video/');
+            const url = URL.createObjectURL(file);
+
+            if (isVideo) {
+                vidPreview.src = url;
+                vidPreview.style.display = 'block';
+                // client-side duration check
+                vidPreview.onloadedmetadata = () => {
+                    if (vidPreview.duration > 10) {
+                        document.getElementById('upload-status').textContent = '動画は10秒以内にしてください（現在: ' + Math.round(vidPreview.duration * 10) / 10 + '秒）';
+                        document.getElementById('upload-status').style.color = '#f44336';
+                        input.value = '';
+                        vidPreview.style.display = 'none';
+                    } else {
+                        document.getElementById('upload-status').textContent = Math.round(vidPreview.duration * 10) / 10 + '秒';
+                        document.getElementById('upload-status').style.color = '#888';
+                    }
+                };
+            } else {
+                imgPreview.src = url;
+                imgPreview.style.display = 'block';
+                document.getElementById('upload-status').textContent = '';
+                document.getElementById('upload-status').style.color = '#888';
+            }
+        }
+
+        async function uploadImage() {
+            const fileInput = document.getElementById('edit-image-file');
+            if (!fileInput.files || !fileInput.files[0]) return null;
+            const status = document.getElementById('upload-status');
+            status.textContent = 'アップロード中...';
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            try {
+                const res = await fetch('<?= $api_base ?>/upload.php', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.success) {
+                    status.textContent = '';
+                    return data.url;
+                } else {
+                    status.textContent = data.error;
+                    return false;
+                }
+            } catch (e) {
+                status.textContent = 'アップロードに失敗しました';
+                return false;
+            }
+        }
+
         async function saveMenu() {
             const id        = document.getElementById('edit-id').value;
             const catName   = document.getElementById('edit-category').value;
             const name      = document.getElementById('edit-name').value.trim();
             const desc      = document.getElementById('edit-desc').value.trim();
             const price     = parseInt(document.getElementById('edit-price').value);
-            const image_url = document.getElementById('edit-image').value.trim();
+            let   image_url = document.getElementById('edit-image').value.trim();
             const available = document.getElementById('edit-available').value;
+
+            // 新しい画像が選択されていればアップロード
+            const uploaded = await uploadImage();
+            if (uploaded === false) return;
+            if (uploaded) image_url = uploaded;
 
             if (!name || isNaN(price)) {
                 alert('商品名と価格は必須です');
@@ -193,7 +282,7 @@ require_admin_login();
             // カテゴリIDを解決
             let category_id = null;
             if (catName) {
-                const res2 = await fetch('../api/menu.php');
+                const res2 = await fetch('<?= $api_base ?>/menu.php');
                 const d2 = await res2.json();
                 // カテゴリIDは別途取得APIが必要だが、ここではPHP側でカテゴリ名で検索するよう拡張
                 category_id = catName; // PHP側で名前からIDに変換
@@ -203,7 +292,7 @@ require_admin_login();
             if (id) payload.id = parseInt(id);
 
             const method = id ? 'PUT' : 'POST';
-            const res = await fetch('../api/menu.php', {
+            const res = await fetch('<?= $api_base ?>/menu.php', {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -221,7 +310,7 @@ require_admin_login();
             const item = menuItems.find(m => m.id === id);
             if (!item) return;
             const payload = { ...item, id, is_available: newVal, category_name: item.category || '' };
-            await fetch('../api/menu.php', {
+            await fetch('<?= $api_base ?>/menu.php', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -231,7 +320,7 @@ require_admin_login();
 
         async function deleteMenu(id, name) {
             if (!confirm(`「${name}」を削除しますか？`)) return;
-            await fetch('../api/menu.php', {
+            await fetch('<?= $api_base ?>/menu.php', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id })

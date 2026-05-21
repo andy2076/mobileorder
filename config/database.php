@@ -2,8 +2,8 @@
 class Database {
     private $host = 'localhost';
     private $db_name = 'mobileorder';
-    private $username = 'root';
-    private $password = ''; // XAMPPのデフォルトはパスワードなし
+    private $username = 'mobileorder_user';
+    private $password = 'MoOrder2026!Sec';
     private $conn;
 
     public function getConnection() {
